@@ -55,5 +55,7 @@ add_subdirectory(test)
 
 find_package(OpenSSL REQUIRED)
 
-target_link_libraries(bpftime_nv_attach_impl PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+find_package(Boost CONFIG REQUIRED COMPONENTS Process)
+
+target_link_libraries(bpftime_nv_attach_impl PRIVATE OpenSSL::SSL OpenSSL::Crypto Boost::process)
 target_include_directories(bpftime_nv_attach_impl PRIVATE ${OPENSSL_INCLUDE_DIR})

@@ -15,7 +15,7 @@
 #include <thread>
 #include <vector>
 
-/* clang++-17 -S ./default_trampoline.cu -Wall --cuda-gpu-arch=sm_60 -O2
+/* clang++-17 -S ./default_trampoline.cu -Wall --cuda-gpu-arch=sm_52 -O2
  * -L/usr/local/cuda/lib64/ -lcudart*/
 // The old 1<<30 value makes the shared segment too large for Boost IPC.
 static constexpr int GPU_HELPER_MAX_BUF = 1 << 24;

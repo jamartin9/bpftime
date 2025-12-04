@@ -15,11 +15,12 @@
 #include <boost/asio/post.hpp>
 #include <boost/asio/thread_pool.hpp>
 #include <boost/process.hpp>
-#include <boost/process/detail/child_decl.hpp>
-#include <boost/process/env.hpp>
-#include <boost/process/io.hpp>
-#include <boost/process/pipe.hpp>
-#include <boost/process/start_dir.hpp>
+#include <boost/process/v1/args.hpp>
+#include <boost/process/v1/child.hpp>
+#include <boost/process/v1/env.hpp>
+#include <boost/process/v1/io.hpp>
+#include <boost/process/v1/pipe.hpp>
+#include <boost/process/v1/start_dir.hpp>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -377,8 +378,8 @@ nv_attach_impl::extract_ptxs(std::vector<uint8_t> &&data_vec)
 	}
 	SPDLOG_INFO("Extracting PTX in the fatbin...");
 	boost::asio::io_context ctx;
-	boost::process::ipstream stream;
-	boost::process::environment env = boost::this_process::environment();
+	boost::process::v1::ipstream stream;
+	boost::process::v1::environment env = boost::this_process::environment();
 	env["LD_PRELOAD"] = "";
 
 	// Build command line - use shell to properly search PATH
@@ -387,10 +388,10 @@ nv_attach_impl::extract_ptxs(std::vector<uint8_t> &&data_vec)
 	SPDLOG_INFO("Calling cuobjdump: {}", cuobjdump_cmd_line);
 
 	// Execute through shell to properly use PATH
-	boost::process::child child(
-		"/bin/sh", boost::process::args({ "-c", cuobjdump_cmd_line }),
-		boost::process::std_out > stream, boost::process::env(env),
-		boost::process::start_dir = tmp_dir);
+	boost::process::v1::child child(
+                                    "/bin/sh", boost::process::v1::args({ "-c", cuobjdump_cmd_line }),
+		boost::process::v1::std_out > stream, boost::process::v1::env(env),
+		boost::process::v1::start_dir = tmp_dir);
 
 	std::string line;
 	while (std::getline(stream, line)) {
@@ -606,6 +607,7 @@ int nv_attach_impl::run_attach_entry_on_gpu(int attach_id, int run_count,
 
 	// Get SM architecture (auto-detect or from BPFTIME_SM_ARCH env)
 	std::string sm_arch = get_gpu_sm_arch();
+
 	SPDLOG_INFO("Using SM architecture: {}", sm_arch);
 
 	std::vector<uint64_t> ebpf_words;

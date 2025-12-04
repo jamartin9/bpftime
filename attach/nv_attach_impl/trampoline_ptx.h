@@ -4,7 +4,7 @@ static const char TRAMPOLINE_PTX[] = R"(
 //
 
 .version 8.1
-.target sm_61
+.target sm_52
 .address_size 64
 
 	// .globl	spin_lock               // -- Begin function spin_lock

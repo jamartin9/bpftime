@@ -19,7 +19,7 @@ pass_runtime_input_from_string(const std::string &str)
 }
 
 static const std::string MINIMAL_PTX = R"(.version 7.0
-.target sm_60
+.target sm_52
 .address_size 64
 
 .visible .entry test_kernel()
@@ -29,7 +29,7 @@ static const std::string MINIMAL_PTX = R"(.version 7.0
 )";
 
 static const std::string KERNEL_WITH_BODY = R"(.version 7.0
-.target sm_60
+.target sm_52
 .address_size 64
 
 .visible .entry foo()
@@ -76,11 +76,11 @@ TEST_CASE("parse_runtime_input parses JSON input", "[ptxpass_core]")
 	SECTION("Valid JSON with full_ptx and to_patch_kernel")
 	{
 		std::string json_input = R"({
-  "full_ptx": ".version 7.0\n.target sm_60\n",
+  "full_ptx": ".version 7.0\n.target sm_52\n",
   "to_patch_kernel": "test_kernel"
 })";
 		auto input = pass_runtime_input_from_string(json_input);
-		REQUIRE(input.full_ptx == ".version 7.0\n.target sm_60\n");
+		REQUIRE(input.full_ptx == ".version 7.0\n.target sm_52\n");
 		REQUIRE(input.to_patch_kernel == "test_kernel");
 	}
 
@@ -145,8 +145,8 @@ TEST_CASE("contains_ret_instruction detects ret instruction", "[ptxpass_core]")
 
 TEST_CASE("validate_ptx_version checks PTX version", "[ptxpass_core]")
 {
-	std::string ptx_v7 = ".version 7.0\n.target sm_60\n";
-	std::string ptx_v6 = ".version 6.5\n.target sm_60\n";
+	std::string ptx_v7 = ".version 7.0\n.target sm_52\n";
+	std::string ptx_v6 = ".version 6.5\n.target sm_52\n";
 
 	REQUIRE(validate_ptx_version(ptx_v7, "6.0"));
 	REQUIRE(validate_ptx_version(ptx_v7, "7.0"));
@@ -182,7 +182,7 @@ TEST_CASE("filter_out_version_headers_ptx removes duplicate header lines",
 	  "[ptxpass_core]")
 {
 	std::string input = R"(.version 7.0
-.target sm_60
+.target sm_52
 .address_size 64
 // comment 1
 
@@ -192,7 +192,7 @@ TEST_CASE("filter_out_version_headers_ptx removes duplicate header lines",
 }
 
 .version 7.0
-.target sm_60
+.target sm_52
 // comment 2
 )";
 
@@ -283,7 +283,7 @@ TEST_CASE("compile_ebpf_to_ptx_from_words compiles eBPF to PTX",
 	std::vector<uint64_t> nop_ebpf = { 0x0000000000000095ULL };
 
 	std::string ptx = compile_ebpf_to_ptx_from_words(
-		nop_ebpf, "sm_60", "__probe__", true, false);
+		nop_ebpf, "sm_52", "__probe__", true, false);
 
 	REQUIRE_FALSE(ptx.empty());
 	REQUIRE(ptx.find("ret") != std::string::npos);
@@ -351,7 +351,7 @@ TEST_CASE("End-to-end JSON workflow with empty eBPF",
 	  "[ptxpass_core][integration]")
 {
 	std::string json_input = R"({
-  "input":{"full_ptx": ".version 7.0\n.target sm_60\n.visible .entry test() {\n  ret;\n}",
+  "input":{"full_ptx": ".version 7.0\n.target sm_52\n.visible .entry test() {\n  ret;\n}",
   "to_patch_kernel": "test"},
   "ebpf_instructions": []
 })";
@@ -371,7 +371,7 @@ TEST_CASE("End-to-end JSON workflow with empty eBPF",
 					      { "require_ret", true } };
 
 		std::string ptx =
-			".version 7.0\n.target sm_60\n.visible .entry test() {\n    ret;\n}";
+			".version 7.0\n.target sm_52\n.visible .entry test() {\n    ret;\n}";
 		REQUIRE(validate_input(ptx, validation));
 	}
 }
@@ -382,7 +382,7 @@ TEST_CASE("compile_ebpf_to_ptx_from_words handles exit instruction",
 	std::vector<uint64_t> exit_only = { 0x0000000000000095ULL };
 
 	std::string result = compile_ebpf_to_ptx_from_words(
-		exit_only, "sm_60", "__probe__", true, false);
+		exit_only, "sm_52", "__probe__", true, false);
 
 	REQUIRE_FALSE(result.empty());
 	REQUIRE(result.find("ret") != std::string::npos);
